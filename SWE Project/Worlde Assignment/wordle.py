@@ -1,3 +1,8 @@
+# game state: Grayed Letters (a.), Letters in Wrong Spot (a?), Correct Letters (a+)
+#             Guesses are seperated by spaces
+
+# Have access to 58,000 english words
+
 import random
 
 def load_words(filename):
@@ -5,8 +10,10 @@ def load_words(filename):
         words = file.read().split()
     return words
 
+
 def choose_word(words):
     return random.choice(words)
+
 
 def provide_feedback(secret_word, guess):
     feedback = []
@@ -18,6 +25,7 @@ def provide_feedback(secret_word, guess):
         else:
             feedback.append('.')
     return ''.join(feedback)
+
 
 def filter_words(words, guess, feedback):
     filtered_words = []
@@ -40,34 +48,40 @@ def filter_words(words, guess, feedback):
             filtered_words.append(word)
     return filtered_words
 
+
 def main():
-    words = load_words('SWE Project/Worlde Assignment/5_letter_words_list.txt')
-    secret_word = choose_word(words)
+
+    # get list of all possible guesses
+    words = load_words('words.txt')
     
-    print("Welcome to Wordle! Try to guess the 5-letter word.")
+    # instructions
+    print("Please enter what you know about the game. Add a '.' after incorrect words, a '?' after letters in the wrong place, and a '+' after correct words.")
     
+    # all words are possible at first
     possible_words = words[:] 
 
-    while True:
-        guess = input("Enter your guess: ").strip().lower()
+    userInput = input("Enter what you know (e to exit): ").strip().lower()
+    while (userInput != "e"):
         
-        if len(guess) != 5:
-            print("Guess must be exactly 5 letters long.")
-            continue
-
-        if guess not in words:
-            print("Word not in list. Please try again.")
-            continue
-
-        feedback = provide_feedback(secret_word, guess)
-        print(f"Feedback: {feedback}")
-
-        if guess == secret_word:
-            print("Congratulations! You've guessed the word!")
-            break
+        # make sure user follows correct format
+        if (len(userInput) != 10 and userInput != "e"):
+            print("Make sure you follow the required format.")
         
+        # seperate symbols and letters
+        guess = []
+        feedback = []
+        for i in range(10):
+            if (i % 2 != 0): feedback.append(userInput[i])
+            else: guess.append(userInput[i])
+
+        # update possible words
         possible_words = filter_words(possible_words, guess, feedback)
-        print(f"Possible words: {', '.join(possible_words)}")
+        if (possible_words != []): print(choose_word(possible_words))
+        else: print("No possible guesses in word list!")
+
+        # get user info for next
+        userInput = input("Enter what you know (e to exit): ").strip().lower()
+
 
 if __name__ == "__main__":
     main()
